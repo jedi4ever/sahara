@@ -4,9 +4,12 @@ module Drifter
   class Shell
  
     def self.execute(command,options = {})
-
-      IO.popen("#{command}") { |f| print f }
-      puts
+      STDOUT.sync = true
+      output=nil
+      result=IO.popen("#{command}") {|f| output=f.readlines}
+      #{ |f| print "#{f}, #{f.class}" }
+#      output=result.read
+      return output
     end
     
     #pty allows you to gradually see the output of a local command

@@ -4,7 +4,7 @@ require 'drifter/shell'
 
 module Drifter
   module Session
-    
+
     def self.determine_vboxcmd
       return "VBoxManage"
     end
@@ -15,76 +15,155 @@ module Drifter
       @sandboxname="drifter-sandbox"
     end
 
-    def self.status(boxname)
+    def self.status(selection)
       self.initialize
-      puts "Status: #{boxname}"
-      puts is_vm_created?(boxname)
-    end
 
-    def self.on(boxname)
-      puts "Entering sandbox state: #{boxname}"
-      self.initialize
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
-      
-      #Creating a snapshot
-      execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
-    end
-
-    def self.commit(boxname)
-      puts "Committing sandbox changes: #{boxname}"
-      
-      self.initialize
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
-      
-      #Discard snapshot so current state is the latest state
-      execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}'")
-
-      #Now retake the snapshot
-      execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+      on_selected_vms(selection) do |boxname|
+        if is_snapshot_mode_on?(boxname)
+          puts "[#{boxname}] - snapshot mode is on"
+        else
+          puts "[#{boxname}] - snapshot mode is off"
+        end
+      end
 
     end
 
-    def self.rollback(boxname)
-      puts "Rollback sandbox: #{boxname}"
+    def self.on(selection)
       self.initialize
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
 
-      puts "Poweringoff machine: #{boxname}"
+      on_selected_vms(selection) do |boxname|
+        if is_snapshot_mode_on?(boxname)
+          puts "[#{boxname}] - snapshot mode is already on"
+        else
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
 
-      #Poweroff machine
-      execute("#{@vboxcmd} controlvm '#{instance_name}' poweroff")
+          #Creating a snapshot
+          puts "[#{boxname}] - Enabling sandbox"
 
-      #Rollback until snapshot
-      execute("#{@vboxcmd} snapshot '#{instance_name}' restore '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+        end
 
-      #Startvm again
-      execute("#{@vboxcmd} startvm '#{instance_name}' ")
-
-      
+      end
     end
 
-    def self.off(boxname)
-      self.initialize
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+    def self.commit(selection)
 
-    # We might wanna check for sandbox changes or not
-    
-    #Discard snapshot
-    execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}' ")
-    
+      self.initialize
+      on_selected_vms(selection) do |boxname|
+
+
+        if !is_snapshot_mode_on?(boxname)
+          puts "[#{boxname}] - this requires that sandbox mode is on."
+        else
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+
+          #Discard snapshot so current state is the latest state
+          puts "[#{boxname}] - unwinding sandbox"
+          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}'")
+
+          #Now retake the snapshot
+          puts "[#{boxname}] - fastforwarding sandbox"
+
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+          
+        end
+
+      end
+
     end
-      
+
+    def self.rollback(selection)
+      self.initialize
+
+      on_selected_vms(selection) do |boxname|
+
+        if !is_snapshot_mode_on?(boxname)
+          puts "[#{boxname}] - this requires that sandbox mode is on."
+        else
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+
+          puts "[#{boxname}] - powering off machine"
+
+          #Poweroff machine
+          execute("#{@vboxcmd} controlvm '#{instance_name}' poweroff")
+
+          puts "[#{boxname}] - roll back machine"
+
+          #Rollback until snapshot
+          execute("#{@vboxcmd} snapshot '#{instance_name}' restore '#{@sandboxname}'")
+
+          puts "[#{boxname}] - starting the machine again"
+
+          #Startvm again
+          execute("#{@vboxcmd} startvm --type headless '#{instance_name}' ")
+          
+        end
+
+      end
+
+
+    end
+
+    def self.off(selection)
+      self.initialize
+
+      on_selected_vms(selection) do |boxname|
+
+
+        instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+
+        if !is_snapshot_mode_on?(boxname)
+          puts "[#{boxname}] - this requires that sandbox mode is on."
+        else
+          puts "[#{boxname}] - switching sandbox off"
+
+          # We might wanna check for sandbox changes or not
+
+          #Discard snapshot
+          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}' ")
+
+        end
+
+      end
+    end
+
     def self.execute(command)
-      puts "#{command}"
-      Drifter::Shell.execute("#{command}")
+      #puts "#{command}"
+      output=Drifter::Shell.execute("#{command}")
+      return output
     end
-    
+
     def self.is_vm_created?(boxname)
       return !@vagrant_env.vms[boxname.to_sym].vm.nil?
     end
 
-    def self.on_selected_vms(boxname,&block)
-      
+    def self.list_snapshots(boxname)
+
+      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+      snapshotlist=Array.new
+      snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable '#{instance_name}' |grep ^SnapshotName| cut -d '=' -f 2")
+      snapshotresult.each do |result|
+        clean=result.gsub(/\"/,'').chomp
+        snapshotlist << clean
+      end
+      return snapshotlist
+    end
+
+    def self.is_snapshot_mode_on?(boxname)
+      snapshots=list_snapshots(boxname)
+      return snapshots.include?(@sandboxname)
+    end
+
+    def self.on_selected_vms(selection,&block)
+      if selection.nil?
+        #puts "no selection was done"
+        @vagrant_env.vms.each do |name,vm|
+          #puts "Processing #{name}"
+          yield name
+        end
+      else
+        yield selection        
+      end
     end
   end
 end
