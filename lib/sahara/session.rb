@@ -1,8 +1,8 @@
 require 'pp'
 
-require 'drift/shell'
+require 'sahara/shell'
 
-module Drift
+module Sahara
   module Session
 
     def self.determine_vboxcmd
@@ -12,7 +12,7 @@ module Drift
     def self.initialize
       @vagrant_env=Vagrant::Environment.new
       @vboxcmd=determine_vboxcmd
-      @sandboxname="drift-sandbox"
+      @sandboxname="sahara-sandbox"
     end
 
     def self.status(selection)
