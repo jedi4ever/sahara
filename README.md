@@ -1,6 +1,6 @@
 # Description
 
-Drifter allows working in sandbox mode within vagrant.
+Sahara allows working in sandbox mode within vagrant.
 
 Typical usage:
 

@@ -1,6 +1,6 @@
 begin
-  require 'drifter'
+  require 'sahara'
 rescue LoadError
   require 'rubygems'
-  require 'drifter'
+  require 'sahara'
 end
