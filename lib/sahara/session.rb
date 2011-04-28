@@ -155,14 +155,27 @@ module Sahara
     end
 
     def self.on_selected_vms(selection,&block)
+      
       if selection.nil?
         #puts "no selection was done"
         @vagrant_env.vms.each do |name,vm|
           #puts "Processing #{name}"
-          yield name
+          if @vagrant_env.multivm? && name.to_s!="default"
+            if is_vm_created?(name)
+              yield name
+            else
+              puts "[#{name}] - machine needs to be upped first"
+            end
+          else
+            #skipping default
+          end
         end
       else
-        yield selection        
+        if is_vm_created?(selection)
+          yield selection
+        else
+          puts "[#{selection}] - machine needs to be upped first"
+        end
       end
     end
   end
