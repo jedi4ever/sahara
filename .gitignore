@@ -1,5 +1,6 @@
 .DS_Store
 gems/*
+pkgs/*
 tmp/*
 .vagrant
 Vagrantfile

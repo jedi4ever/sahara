@@ -1,6 +1,6 @@
 # Description
 
-Sahara allows working in sandbox mode within vagrant.
+Sahara allows vagrant to operate in sandbox mode
 
 Typical usage:
 
@@ -10,6 +10,10 @@ Typical usage:
 - If not satisfied you can rollback: <pre>vagrant sandbox rollback</pre>
 - To leave sandbox mod: <pre>vagrant sandbox off</pre>
 
-Many kudos go to the creators of vagrant
+Many kudos go to the creators of [vagrant](http://vagrantup.com)
 
-Note: this is currently work in progress
+# Installation
+
+This is now available as gem:
+
+<pre>gem install sahara</pre>
