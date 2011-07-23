@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    sahara (0.0.4)
+    sahara (0.0.5)
       popen4 (~> 0.1.2)
       thor (~> 0.14.6)
-      vagrant (~> 0.8.1)
+      vagrant (~> 0.8.2)
 
 GEM
   remote: http://rubygems.org/
@@ -23,7 +23,7 @@ GEM
       Platform (>= 0.4.0)
       open4 (>= 0.4.0)
     thor (0.14.6)
-    vagrant (0.8.1)
+    vagrant (0.8.2)
       archive-tar-minitar (= 0.5.2)
       erubis (~> 2.7.0)
       i18n (~> 0.5.0)
@@ -31,8 +31,8 @@ GEM
       net-scp (~> 1.0.4)
       net-ssh (~> 2.1.4)
       thor (~> 0.14.6)
-      virtualbox (~> 0.9.0)
-    virtualbox (0.9.0)
+      virtualbox (~> 0.9.1)
+    virtualbox (0.9.1)
       ffi (~> 1.0.9)
 
 PLATFORMS
