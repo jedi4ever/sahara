@@ -40,7 +40,7 @@ module Sahara
           #Creating a snapshot
           puts "[#{boxname}] - Enabling sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
         end
 
       end
@@ -59,7 +59,7 @@ module Sahara
 
           #Discard snapshot so current state is the latest state
           puts "[#{boxname}] - unwinding sandbox"
-          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}' --pause")
 
           #Now retake the snapshot
           puts "[#{boxname}] - fastforwarding sandbox"
