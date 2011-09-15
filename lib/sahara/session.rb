@@ -99,8 +99,22 @@ module Sahara
           puts "[#{boxname}] - starting the machine again"
 
           #Startvm again
-          execute("#{@vboxcmd} startvm --type headless '#{instance_name}' ")
-          
+          #
+          # Grab the boot_mode setting from the Vagrantfile
+          config_boot_mode="#{@vagrant_env.config.vm.boot_mode.to_s}"
+
+          case config_boot_mode
+            when 'vrdp'
+              boot_mode='headless'
+            when 'gui'
+              boot_mode='gui'
+            else
+              puts "Vagrantfile config.vm.boot_mode=#{config_boot_mode} setting unknown - defaulting to headless"
+              boot_mode='headless'
+          end
+
+          execute("#{@vboxcmd} startvm --type #{boot_mode} '#{instance_name}' ")
+
         end
 
       end
