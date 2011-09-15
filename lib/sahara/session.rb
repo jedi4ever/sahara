@@ -64,7 +64,7 @@ module Sahara
           #Now retake the snapshot
           puts "[#{boxname}] - fastforwarding sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
           
         end
 
