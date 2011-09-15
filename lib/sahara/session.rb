@@ -40,7 +40,7 @@ module Sahara
           #Creating a snapshot
           puts "[#{boxname}] - Enabling sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
         end
 
       end
@@ -64,7 +64,7 @@ module Sahara
           #Now retake the snapshot
           puts "[#{boxname}] - fastforwarding sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
           
         end
 
@@ -87,6 +87,10 @@ module Sahara
           #Poweroff machine
           execute("#{@vboxcmd} controlvm '#{instance_name}' poweroff")
 
+          #Poweroff takes a second or so to complete; Virtualbox will throw errors
+          #if you try to restore a snapshot before it's ready.
+          sleep 2
+
           puts "[#{boxname}] - roll back machine"
 
           #Rollback until snapshot
@@ -95,8 +99,22 @@ module Sahara
           puts "[#{boxname}] - starting the machine again"
 
           #Startvm again
-          execute("#{@vboxcmd} startvm --type headless '#{instance_name}' ")
-          
+          #
+          # Grab the boot_mode setting from the Vagrantfile
+          config_boot_mode="#{@vagrant_env.config.vm.boot_mode.to_s}"
+
+          case config_boot_mode
+            when 'vrdp'
+              boot_mode='headless'
+            when 'gui'
+              boot_mode='gui'
+            else
+              puts "Vagrantfile config.vm.boot_mode=#{config_boot_mode} setting unknown - defaulting to headless"
+              boot_mode='headless'
+          end
+
+          execute("#{@vboxcmd} startvm --type #{boot_mode} '#{instance_name}' ")
+
         end
 
       end
