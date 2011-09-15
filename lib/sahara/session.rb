@@ -87,6 +87,10 @@ module Sahara
           #Poweroff machine
           execute("#{@vboxcmd} controlvm '#{instance_name}' poweroff")
 
+          #Poweroff takes a second or so to complete; Virtualbox will throw errors
+          #if you try to restore a snapshot before it's ready.
+          sleep 2
+
           puts "[#{boxname}] - roll back machine"
 
           #Rollback until snapshot
