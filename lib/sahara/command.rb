@@ -1,33 +1,12 @@
-require 'sahara/session'
-
 module Sahara
-	class Command < Vagrant::Command::GroupBase
-	  register "sandbox","Manages a sandbox"
+  module Command
+    autoload :Sandbox,      'sahara/command/sandbox'
+    autoload :SandboxStatus,      'sahara/command/sandbox_status'
+    autoload :SandboxOn,      'sahara/command/sandbox_on'
+    autoload :SandboxCommit,      'sahara/command/sandbox_commit'
+    autoload :SandboxRollback,      'sahara/command/sandbox_rollback'
+    autoload :SandboxOff,      'sahara/command/sandbox_off'
 
-	  desc "status [NAME]", "Shows the status of the sandbox"
-	  def status(boxname=nil)
-	    Sahara::Session.status(boxname)
-	  end
-
-	  desc "on [NAME]", "Enters sandbox state"
-	  def on(boxname=nil)
-	    Sahara::Session.on(boxname)
-	  end
-
-	  desc "commit [NAME]", "Commits changes - moves sandbox initial state to currentstate"
-	  def commit(boxname=nil)
-	    Sahara::Session.commit(boxname)
-	  end
-
-	  desc "rollback [NAME]", "Rollback changes since sandbox state was entered "
-	  def rollback(boxname=nil)
-	    Sahara::Session.rollback(boxname)
-	  end
-	  
-	  desc "off [NAME] ", "Leaves sandbox state"
-	  def off(boxname=nil)
-	    Sahara::Session.off(boxname)
-	  end
-    
-	end
+    Vagrant.commands.register(:sandbox) { Sahara::Command::Sandbox }
+  end
 end

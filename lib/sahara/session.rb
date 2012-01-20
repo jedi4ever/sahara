@@ -3,21 +3,19 @@ require 'pp'
 require 'sahara/shell'
 
 module Sahara
-  module Session
+  class Session
 
-    def self.determine_vboxcmd
+    def determine_vboxcmd
       return "VBoxManage"
     end
 
-    def self.initialize
-      @vagrant_env=Vagrant::Environment.new
+    def initialize(env)
+      @vagrant_env=env
       @vboxcmd=determine_vboxcmd
       @sandboxname="sahara-sandbox"
     end
 
-    def self.status(selection)
-      self.initialize
-
+    def status(selection)
       on_selected_vms(selection) do |boxname|
         if is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - snapshot mode is on"
@@ -28,14 +26,12 @@ module Sahara
 
     end
 
-    def self.on(selection)
-      self.initialize
-
+    def on(selection)
       on_selected_vms(selection) do |boxname|
         if is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - snapshot mode is already on"
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           #Creating a snapshot
           puts "[#{boxname}] - Enabling sandbox"
@@ -46,16 +42,14 @@ module Sahara
       end
     end
 
-    def self.commit(selection)
-
-      self.initialize
+    def commit(selection)
       on_selected_vms(selection) do |boxname|
 
 
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           #Discard snapshot so current state is the latest state
           puts "[#{boxname}] - unwinding sandbox"
@@ -72,15 +66,13 @@ module Sahara
 
     end
 
-    def self.rollback(selection)
-      self.initialize
-
+    def rollback(selection)
       on_selected_vms(selection) do |boxname|
 
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_name="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           puts "[#{boxname}] - powering off machine"
 
@@ -101,10 +93,12 @@ module Sahara
           #Startvm again
           #
           # Grab the boot_mode setting from the Vagrantfile
-          config_boot_mode="#{@vagrant_env.config.vm.boot_mode.to_s}"
+          config_boot_mode="#{@vagrant_env.vms[boxname.to_sym].config.vm.boot_mode.to_s}"
 
           case config_boot_mode
             when 'vrdp'
+              boot_mode='headless'
+            when 'headless'
               boot_mode='headless'
             when 'gui'
               boot_mode='gui'
@@ -122,13 +116,11 @@ module Sahara
 
     end
 
-    def self.off(selection)
-      self.initialize
-
+    def off(selection)
       on_selected_vms(selection) do |boxname|
 
 
-        instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+        instance_name="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
@@ -145,19 +137,19 @@ module Sahara
       end
     end
 
-    def self.execute(command)
+    def execute(command)
       #puts "#{command}"
       output=Sahara::Shell.execute("#{command}")
       return output
     end
 
-    def self.is_vm_created?(boxname)
-      return !@vagrant_env.vms[boxname.to_sym].vm.nil?
+    def is_vm_created?(boxname)
+      return @vagrant_env.vms[boxname.to_sym].state != :not_created
     end
 
-    def self.list_snapshots(boxname)
+    def list_snapshots(boxname)
 
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+      instance_name="#{@vagrant_env.vms[boxname.to_sym].uuid}"
       snapshotlist=Array.new
       snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable '#{instance_name}' |grep ^SnapshotName| cut -d '=' -f 2")
       snapshotresult.each do |result|
@@ -167,12 +159,12 @@ module Sahara
       return snapshotlist
     end
 
-    def self.is_snapshot_mode_on?(boxname)
+    def is_snapshot_mode_on?(boxname)
       snapshots=list_snapshots(boxname)
       return snapshots.include?(@sandboxname)
     end
 
-    def self.on_selected_vms(selection,&block)
+    def on_selected_vms(selection,&block)
       
       if selection.nil?
         #puts "no selection was done"
