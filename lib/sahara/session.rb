@@ -35,12 +35,12 @@ module Sahara
         if is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - snapshot mode is already on"
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           #Creating a snapshot
           puts "[#{boxname}] - Enabling sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
+          execute("#{@vboxcmd} snapshot '#{instance_uuid}' take '#{@sandboxname}' --pause")
         end
 
       end
@@ -55,16 +55,16 @@ module Sahara
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           #Discard snapshot so current state is the latest state
           puts "[#{boxname}] - unwinding sandbox"
-          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_uuid}' delete '#{@sandboxname}'")
 
           #Now retake the snapshot
           puts "[#{boxname}] - fastforwarding sandbox"
 
-          execute("#{@vboxcmd} snapshot '#{instance_name}' take '#{@sandboxname}' --pause")
+          execute("#{@vboxcmd} snapshot '#{instance_uuid}' take '#{@sandboxname}' --pause")
           
         end
 
@@ -80,12 +80,12 @@ module Sahara
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
         else
-          instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+          instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
           puts "[#{boxname}] - powering off machine"
 
           #Poweroff machine
-          execute("#{@vboxcmd} controlvm '#{instance_name}' poweroff")
+          execute("#{@vboxcmd} controlvm '#{instance_uuid}' poweroff")
 
           #Poweroff takes a second or so to complete; Virtualbox will throw errors
           #if you try to restore a snapshot before it's ready.
@@ -94,7 +94,7 @@ module Sahara
           puts "[#{boxname}] - roll back machine"
 
           #Rollback until snapshot
-          execute("#{@vboxcmd} snapshot '#{instance_name}' restore '#{@sandboxname}'")
+          execute("#{@vboxcmd} snapshot '#{instance_uuid}' restore '#{@sandboxname}'")
 
           puts "[#{boxname}] - starting the machine again"
 
@@ -113,7 +113,7 @@ module Sahara
               boot_mode='headless'
           end
 
-          execute("#{@vboxcmd} startvm --type #{boot_mode} '#{instance_name}' ")
+          execute("#{@vboxcmd} startvm --type #{boot_mode} '#{instance_uuid}' ")
 
         end
 
@@ -128,7 +128,7 @@ module Sahara
       on_selected_vms(selection) do |boxname|
 
 
-        instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+        instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
 
         if !is_snapshot_mode_on?(boxname)
           puts "[#{boxname}] - this requires that sandbox mode is on."
@@ -138,7 +138,7 @@ module Sahara
           # We might wanna check for sandbox changes or not
 
           #Discard snapshot
-          execute("#{@vboxcmd} snapshot '#{instance_name}' delete '#{@sandboxname}' ")
+          execute("#{@vboxcmd} snapshot '#{instance_uuid}' delete '#{@sandboxname}' ")
 
         end
 
@@ -152,14 +152,14 @@ module Sahara
     end
 
     def self.is_vm_created?(boxname)
-      return !@vagrant_env.vms[boxname.to_sym].vm.nil?
+        return !@vagrant_env.vms[boxname.to_sym].uuid.nil?
     end
 
     def self.list_snapshots(boxname)
 
-      instance_name="#{@vagrant_env.vms[boxname.to_sym].vm.name}"
+      instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
       snapshotlist=Array.new
-      snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable '#{instance_name}' |grep ^SnapshotName| cut -d '=' -f 2")
+      snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable '#{instance_uuid}' |grep ^SnapshotName| cut -d '=' -f 2")
       snapshotresult.each do |result|
         clean=result.gsub(/\"/,'').chomp
         snapshotlist << clean
