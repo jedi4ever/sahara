@@ -101,10 +101,12 @@ module Sahara
           #Startvm again
           #
           # Grab the boot_mode setting from the Vagrantfile
-          config_boot_mode="#{@vagrant_env.config.vm.boot_mode.to_s}"
+          config_boot_mode="#{@vagrant_env.vms[boxname.to_sym].config.vm.boot_mode.to_s}"
 
           case config_boot_mode
             when 'vrdp'
+              boot_mode='headless'
+            when 'headless'
               boot_mode='headless'
             when 'gui'
               boot_mode='gui'
