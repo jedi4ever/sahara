@@ -154,7 +154,12 @@ module Sahara
     end
 
     def self.is_vm_created?(boxname)
+      if @vagrant_env.vms[boxname.to_sym].nil?
+        puts "[#{boxname}] - Box name doesn't exist in the Vagrantfile"
+        return false
+      else
         return !@vagrant_env.vms[boxname.to_sym].uuid.nil?
+      end
     end
 
     def self.list_snapshots(boxname)
