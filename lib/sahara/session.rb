@@ -6,7 +6,25 @@ module Sahara
   module Session
 
     def self.determine_vboxcmd
-      return "VBoxManage"
+	  if windows?
+		  # On Windows, we use the VBOX_INSTALL_PATH environmental
+          if ENV.has_key?("VBOX_INSTALL_PATH")
+            # The path usually ends with a \ but we make sure here
+            path = ENV["VBOX_INSTALL_PATH"]
+            path += "\\" if !path.end_with?("\\")
+            return "\"#{path}VBoxManage.exe\""
+          end
+	  else
+		# for other platforms assume it is on the PATH
+		return "VBoxManage"
+	  end
+    end
+	
+	def self.windows?
+      %W[mingw mswin].each do |text|
+        return true if RbConfig::CONFIG["host_os"].downcase.include?(text)
+      end
+	  false
     end
 
     def self.initialize
@@ -166,8 +184,9 @@ module Sahara
 
       instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
       snapshotlist=Array.new
-      snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable \"#{instance_uuid}\" |grep ^SnapshotName| cut -d '=' -f 2")
-      snapshotresult.each do |result|
+	  output=execute("#{@vboxcmd} showvminfo --machinereadable \"#{instance_uuid}\"").join
+	  snapshotresult=output.scan(/SnapshotName.*=(.*)/).flatten
+	  snapshotresult.each do |result|
         clean=result.gsub(/\"/,'').chomp
         snapshotlist << clean
       end
