@@ -187,17 +187,17 @@ module Sahara
           #puts "Processing #{name}"
           if @vagrant_env.multivm?
             if name.to_s!="default"
-            if is_vm_created?(name)
-              yield name
-            else
-              puts "[#{name}] - machine needs to be upped first"
+              if is_vm_created?(name)
+                yield name
+              else
+                puts "[#{name}] - machine not created"
+              end
             end
-          end
           else
             if is_vm_created?(name)
               yield name
             else
-              puts "[#{name}] - machine needs to be upped first"
+              puts "[#{name}] - machine not created"
             end
           end
         end
@@ -205,7 +205,7 @@ module Sahara
         if is_vm_created?(selection)
           yield selection
         else
-          puts "[#{selection}] - machine needs to be upped first"
+          puts "[#{selection}] - machine not created"
         end
       end
     end
