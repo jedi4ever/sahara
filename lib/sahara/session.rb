@@ -6,18 +6,17 @@ module Sahara
   module Session
 
     def self.determine_vboxcmd
-	  if windows?
-		  # On Windows, we use the VBOX_INSTALL_PATH environmental
-          if ENV.has_key?("VBOX_INSTALL_PATH")
-            # The path usually ends with a \ but we make sure here
-            path = ENV["VBOX_INSTALL_PATH"]
-            path += "\\" if !path.end_with?("\\")
-            return "\"#{path}VBoxManage.exe\""
-          end
-	  else
-		# for other platforms assume it is on the PATH
-		return "VBoxManage"
-	  end
+      if windows?
+        # On Windows, we use the VBOX_INSTALL_PATH environmental
+        if ENV.has_key?("VBOX_INSTALL_PATH")
+          # The path usually ends with a \ but we make sure here
+          path = File.join(ENV["VBOX_INSTALL_PATH"], "VBoxManage.exe")
+          return "\"#{path}\""
+        end
+  	  else
+        # for other platforms assume it is on the PATH
+        return "VBoxManage"
+      end
     end
 	
 	def self.windows?
