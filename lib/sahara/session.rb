@@ -6,7 +6,24 @@ module Sahara
   module Session
 
     def self.determine_vboxcmd
-      return "VBoxManage"
+      if windows?
+        # On Windows, we use the VBOX_INSTALL_PATH environmental
+        if ENV.has_key?("VBOX_INSTALL_PATH")
+          # The path usually ends with a \ but we make sure here
+          path = File.join(ENV["VBOX_INSTALL_PATH"], "VBoxManage.exe")
+          return "\"#{path}\""
+        end
+      else
+        # for other platforms assume it is on the PATH
+        return "VBoxManage"
+      end
+    end
+
+    def self.windows?
+      %W[mingw mswin].each do |text|
+        return true if RbConfig::CONFIG["host_os"].downcase.include?(text)
+      end
+      false
     end
 
     def self.initialize
@@ -65,7 +82,7 @@ module Sahara
           puts "[#{boxname}] - fastforwarding sandbox"
 
           execute("#{@vboxcmd} snapshot \"#{instance_uuid}\" take \"#{@sandboxname}\" --pause")
-          
+
         end
 
       end
@@ -104,15 +121,15 @@ module Sahara
           config_boot_mode="#{@vagrant_env.vms[boxname.to_sym].config.vm.boot_mode.to_s}"
 
           case config_boot_mode
-            when 'vrdp'
-              boot_mode='headless'
-            when 'headless'
-              boot_mode='headless'
-            when 'gui'
-              boot_mode='gui'
-            else
-              puts "Vagrantfile config.vm.boot_mode=#{config_boot_mode} setting unknown - defaulting to headless"
-              boot_mode='headless'
+          when 'vrdp'
+            boot_mode='headless'
+          when 'headless'
+            boot_mode='headless'
+          when 'gui'
+            boot_mode='gui'
+          else
+            puts "Vagrantfile config.vm.boot_mode=#{config_boot_mode} setting unknown - defaulting to headless"
+            boot_mode='headless'
           end
 
           execute("#{@vboxcmd} startvm --type #{boot_mode} \"#{instance_uuid}\" ")
@@ -166,7 +183,8 @@ module Sahara
 
       instance_uuid="#{@vagrant_env.vms[boxname.to_sym].uuid}"
       snapshotlist=Array.new
-      snapshotresult=execute("#{@vboxcmd} showvminfo --machinereadable \"#{instance_uuid}\" |grep ^SnapshotName| cut -d '=' -f 2")
+      output=execute("#{@vboxcmd} showvminfo --machinereadable \"#{instance_uuid}\"").join
+      snapshotresult=output.scan(/SnapshotName.*=(.*)/).flatten
       snapshotresult.each do |result|
         clean=result.gsub(/\"/,'').chomp
         snapshotlist << clean
@@ -180,7 +198,7 @@ module Sahara
     end
 
     def self.on_selected_vms(selection,&block)
-      
+
       if selection.nil?
         #puts "no selection was done"
         @vagrant_env.vms.each do |name,vm|

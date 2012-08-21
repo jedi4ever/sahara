@@ -20,8 +20,4 @@ This is now available as gem:
 
 # Windows Notes
 
-It works on Windows, but you need to have:
-
-- Vagrant 1.0.x installed (with patch for [issue#817](https://github.com/mitchellh/vagrant/issues/817))
-- VBoxManage.exe in the PATH <pre>set PATH=C:\Program Files\Oracle\VirtualBox\;%PATH%</pre>
-- grep.exe and cut.exe in the PATH: <pre>set PATH=D:\vagrant\embedded\bin;%PATH%</pre>
+It works on Windows with Vagrant 1.0.x installed (with patch for [issue#817](https://github.com/mitchellh/vagrant/issues/817))
