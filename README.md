@@ -16,7 +16,7 @@ Many kudos go to the creators of [vagrant](http://vagrantup.com)
 
 This is now available as gem:
 
-<pre>gem install sahara</pre>
+<pre>vagrant gem install sahara</pre>
 
 # Windows Notes
 
