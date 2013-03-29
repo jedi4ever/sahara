@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Off < ::Vagrant::Command::Base
+    class Off < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
       def execute
 
         options = {}
@@ -16,9 +16,10 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        boxname=argv[0]
-        begin
-          Sahara::Session.off(boxname)
+        ses = Sahara::Session::Command.new(@app, @env)
+
+        with_target_vms(argv, :reverse => true) do |machine|
+          ses.off(machine)
         end
       end
     end

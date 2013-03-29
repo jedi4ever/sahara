@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Rollback < ::Vagrant::Command::Base
+    class Rollback < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
       def execute
 
         options = {}
@@ -16,9 +16,10 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        boxname=argv[0]
-        begin
-          Sahara::Session.rollback(boxname)
+        ses = Sahara::Session::Command.new(@app, @env)
+
+        with_target_vms(argv, :reverse => true) do |machine|
+          ses.rollback(machine)
         end
       end
     end

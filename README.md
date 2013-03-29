@@ -1,3 +1,9 @@
+# Warnings
+
+This is a forked version of Sahara.
+
+This plugin enables you to use sandbox mode with Vagrant 1.1 .
+
 # Description
 
 Sahara allows vagrant to operate in sandbox mode.
@@ -16,8 +22,10 @@ Many kudos go to the creators of [vagrant](http://vagrantup.com)
 
 This is now available as gem:
 
-<pre>vagrant gem install sahara</pre>
+<pre>
+bundle install
+rake build
+vagrant plugin install pkg/sahara-0.0.xx.gem
+</pre>
 
-# Windows Notes
 
-It works on Windows with Vagrant 1.0.x installed (with patch for [issue#817](https://github.com/mitchellh/vagrant/issues/817))
