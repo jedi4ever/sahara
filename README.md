@@ -1,8 +1,8 @@
-# Warnings
+# Notice
 
-- This is a forked version of Sahara.
-- This plugin enables you to use sandbox mode with Vagrant 1.1 .
-- VirtualBox 4.2.10 is required (4.2.6 does not work fine because of VBoxManage problem)
+- Sahara does not work with Vagrant 1.0 or lower.
+- If you want to install an old version for Vagrant 1.0, you have to run the command like "gem install sahara -v 0.0.13"
+- But I strongly recommend you to upgrade your Vagrant to latest version.
 
 # Description
 
@@ -20,12 +20,17 @@ Many kudos go to the creators of [vagrant](http://vagrantup.com)
 
 # Installation
 
-This is now available as gem:
-
+From source:
 <pre>
 bundle install
 rake build
 vagrant plugin install pkg/sahara-0.0.xx.gem
 </pre>
 
+This is now available as gem:
+<pre>
+vagrant plugin install sahara
+</pre>
 
+# License
+This is licensed under the MIT license.
