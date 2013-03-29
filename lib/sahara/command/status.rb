@@ -2,7 +2,7 @@ require 'optparse'
 
 module Sahara
   module Command
-    class Status < ::Vagrant::Command::Base
+    class Status < Vagrant.plugin("2", :command)
 
       def execute
 
@@ -19,9 +19,10 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        boxname=argv[0]
-        begin
-          Sahara::Session.status(boxname)
+        ses = Sahara::Session::Command.new(@app, @env)
+
+        with_target_vms(argv, :reverse => true) do |machine|
+          ses.status(machine)
         end
       end
     end
