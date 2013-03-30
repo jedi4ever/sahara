@@ -35,7 +35,7 @@ module Sahara
       def list_snapshots(machine)
         snapshotlist=Array.new
         instance_id = machine.id
-        output = `#{@vboxcmd} showvminfo --machinereadable \"#{instance_id}\"`
+        output = `#{@vboxcmd} showvminfo --machinereadable "#{instance_id}"`
         snapshotresult=output.scan(/SnapshotName.*=(.*)/).flatten
         snapshotresult.each do |result|
           clean=result.gsub(/\"/,'').chomp
@@ -68,7 +68,7 @@ module Sahara
         end
         if self.is_snapshot_mode_on?(machine) then
           instance_id = machine.id
-          `#{@vboxcmd} snapshot \"#{instance_id}\" delete \"#{@sandboxname}\" `
+          `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}" `
         else
           puts "NOT sandbox mode now"
         end
@@ -81,7 +81,7 @@ module Sahara
         end
         if !self.is_snapshot_mode_on?(machine) then
           instance_id = machine.id
-          `#{@vboxcmd} snapshot \"#{instance_id}\" take \"#{@sandboxname}\" --pause`
+          `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
         else
           puts "already sandbox mode"
         end
@@ -94,8 +94,8 @@ module Sahara
         end
         if self.is_snapshot_mode_on?(machine) then
           instance_id = machine.id
-          `#{@vboxcmd} snapshot \"#{instance_id}\" delete \"#{@sandboxname}\"`
-          `#{@vboxcmd} snapshot \"#{instance_id}\" take \"#{@sandboxname}\" --pause`
+          `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}"`
+          `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
         else
           puts "NOT sandbox mode now"
         end
@@ -112,9 +112,9 @@ module Sahara
         end
   
         instance_id = machine.id
-        `#{@vboxcmd} controlvm \"#{instance_id}\" poweroff `
+        `#{@vboxcmd} controlvm "#{instance_id}" poweroff `
         sleep 2
-        `#{@vboxcmd} snapshot \"#{instance_id}\" restore \"#{@sandboxname}\"`
+        `#{@vboxcmd} snapshot "#{instance_id}" restore "#{@sandboxname}"`
   
         gui_boot = machine.provider_config.gui
         if gui_boot 
@@ -123,7 +123,7 @@ module Sahara
           boot_mode = "headless"
         end
         # restore boot mode
-        `#{@vboxcmd} startvm --type #{boot_mode} \"#{instance_id}\" `
+        `#{@vboxcmd} startvm --type #{boot_mode} "#{instance_id}" `
       end
   
       def is_vm_created?(machine)

@@ -1,8 +1,8 @@
 # Warnings
 
-This is a forked version of Sahara.
-
-This plugin enables you to use sandbox mode with Vagrant 1.1 .
+- This is a forked version of Sahara.
+- This plugin enables you to use sandbox mode with Vagrant 1.1 .
+- VirtualBox 4.2.10 is required (4.2.6 does not work fine because of VBoxManage problem)
 
 # Description
 
