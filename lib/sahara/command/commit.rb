@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Commit < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
+    class Commit < Vagrant.plugin("2", :command)
       def execute
 
         options = {}

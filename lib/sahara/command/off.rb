@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Off < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
+    class Off < Vagrant.plugin("2", :command)
       def execute
 
         options = {}

@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Rollback < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
+    class Rollback < Vagrant.plugin("2", :command)
       def execute
 
         options = {}

@@ -2,7 +2,7 @@ require 'optparse'
 
 module Sahara
   module Command
-    class Status < Vagrant.plugin("2", :command) # < ::Vagrant::Command::Base
+    class Status < Vagrant.plugin("2", :command)
 
       def execute
 
