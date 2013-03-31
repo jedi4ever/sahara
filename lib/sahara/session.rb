@@ -46,13 +46,13 @@ module Sahara
   
       def status(machine)
         if !self.is_vm_created?(machine) then
-          puts "vm is not created"
+          puts "[#{machine.name}] VM is not created"
           return
         end
         if self.is_snapshot_mode_on?(machine) then
-          puts "Sandbox mode is on"
+          puts "[#{machine.name}] Sandbox mode is on"
         else
-          puts "Sandbox mode is off"
+          puts "[#{machine.name}] Sandbox mode is off"
         end
       end
   
@@ -63,33 +63,33 @@ module Sahara
   
       def off(machine)
         if !self.is_vm_created?(machine) then
-          puts "vm is not created"
+          puts "[#{machine.name}] VM is not created"
           return
         end
         if self.is_snapshot_mode_on?(machine) then
           instance_id = machine.id
           `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}" `
         else
-          puts "NOT sandbox mode now"
+          puts "[#{machine.name}] Not sandbox mode now"
         end
       end
   
       def on(machine)
         if !self.is_vm_created?(machine) then
-          puts "vm is not created"
+          puts "[#{machine.name}] VM is not created"
           return
         end
         if !self.is_snapshot_mode_on?(machine) then
           instance_id = machine.id
           `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
         else
-          puts "already sandbox mode"
+          puts "[#{machine.name}] Already sandbox mode"
         end
       end
   
       def commit(machine)
         if !self.is_vm_created?(machine) then
-          puts "vm is not created"
+          puts "[#{machine.name}] VM is not created"
           return
         end
         if self.is_snapshot_mode_on?(machine) then
@@ -97,17 +97,17 @@ module Sahara
           `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}"`
           `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
         else
-          puts "NOT sandbox mode now"
+          puts "[#{machine.name}] Not sandbox mode now"
         end
       end
   
       def rollback(machine)
         if !self.is_vm_created?(machine) then
-          puts "vm is not created"
+          puts "[#{machine.name}] VM is not created"
           return
         end
         if !self.is_snapshot_mode_on?(machine) then
-          puts "NOT sandbox mode now"
+          puts "[#{machine.name}] Not sandbox mode now"
           return
         end
   
