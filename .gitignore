@@ -4,3 +4,4 @@ pkg/*
 tmp/*
 .vagrant
 Vagrantfile
+Gemfile.lock

@@ -1,3 +1,9 @@
+# Notice
+
+- Sahara does not work with Vagrant 1.0 or lower.
+- If you want to install an old version for Vagrant 1.0, you have to run the command like "gem install sahara -v 0.0.13"
+- But I strongly recommend you to upgrade your Vagrant to latest version.
+
 # Description
 
 Sahara allows vagrant to operate in sandbox mode.
@@ -14,10 +20,17 @@ Many kudos go to the creators of [vagrant](http://vagrantup.com)
 
 # Installation
 
+From source:
+<pre>
+bundle install
+rake build
+vagrant plugin install pkg/sahara-0.0.xx.gem
+</pre>
+
 This is now available as gem:
+<pre>
+vagrant plugin install sahara
+</pre>
 
-<pre>vagrant plugin install sahara</pre>
-
-# Windows Notes
-
-It works on Windows with Vagrant 1.0.x installed (with patch for [issue#817](https://github.com/mitchellh/vagrant/issues/817))
+# License
+This is licensed under the MIT license.

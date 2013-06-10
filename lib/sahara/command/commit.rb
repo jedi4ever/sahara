@@ -1,6 +1,6 @@
 module Sahara
   module Command
-    class Commit < ::Vagrant::Command::Base
+    class Commit < Vagrant.plugin("2", :command)
       def execute
 
         options = {}
@@ -16,9 +16,10 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        boxname=argv[0]
-        begin
-          Sahara::Session.commit(boxname)
+        ses = Sahara::Session::Command.new(@app, @env)
+
+        with_target_vms(argv, :reverse => true) do |machine|
+          ses.commit(machine)
         end
       end
     end
