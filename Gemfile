@@ -1,5 +1,5 @@
 source "http://rubygems.org"
 
-gem "sahara", :path => "."
+gemspec
 gem "rake"
-#gem "vagrant", :git => "git://github.com/mitchellh/vagrant.git"
+
