@@ -18,13 +18,13 @@ module Sahara
 
         with_target_vms(argv, :reverse => true) do |machine|
 
-          ses = Sahara::Session::Factory.create(machine.provider_name)
-          if !ses.is_vm_created?(machine) then
+          ses = Sahara::Session::Factory.create(machine)
+          if !ses.is_vm_created? then
             puts "[#{machine.name}] VM is not created"
             next
           end
-          if ses.is_snapshot_mode_on?(machine) then
-            ses.off(machine)
+          if ses.is_snapshot_mode_on? then
+            ses.off
           else
             puts "[#{machine.name}] Not sandbox mode now"
           end

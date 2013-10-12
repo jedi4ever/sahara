@@ -2,7 +2,9 @@ module Sahara
   module Session
     class Virtualbox
 
-      def initialize
+      def initialize(machine)
+        @machine=machine
+        @instance_id = @machine.id
         @vboxcmd=determine_vboxcmd
         @sandboxname="sahara-sandbox"
       end
@@ -28,10 +30,9 @@ module Sahara
         false
       end
 
-      def list_snapshots(machine)
+      def list_snapshots
         snapshotlist=Array.new
-        instance_id = machine.id
-        output = `#{@vboxcmd} showvminfo --machinereadable "#{instance_id}"`
+        output = `#{@vboxcmd} showvminfo --machinereadable "#{@instance_id}"`
         snapshotresult=output.scan(/SnapshotName.*=(.*)/).flatten
         snapshotresult.each do |result|
           clean=result.gsub(/\"/,'').chomp
@@ -40,45 +41,41 @@ module Sahara
         snapshotlist
       end
 
-      def is_snapshot_mode_on?(machine)
-        snapshots=self.list_snapshots(machine)
+      def is_snapshot_mode_on?
+        snapshots=self.list_snapshots
         return snapshots.include?(@sandboxname)
       end
 
-      def off(machine)
-        instance_id = machine.id
-        `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}" `
+      def off
+        `#{@vboxcmd} snapshot "#{@instance_id}" delete "#{@sandboxname}" `
       end
 
-      def on(machine)
-        instance_id = machine.id
-        `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
+      def on
+        `#{@vboxcmd} snapshot "#{@instance_id}" take "#{@sandboxname}" --pause`
       end
 
-      def commit(machine)
-        instance_id = machine.id
-        `#{@vboxcmd} snapshot "#{instance_id}" delete "#{@sandboxname}"`
-        `#{@vboxcmd} snapshot "#{instance_id}" take "#{@sandboxname}" --pause`
+      def commit
+        `#{@vboxcmd} snapshot "#{@instance_id}" delete "#{@sandboxname}"`
+        `#{@vboxcmd} snapshot "#{@instance_id}" take "#{@sandboxname}" --pause`
       end
 
-      def rollback(machine)
-        instance_id = machine.id
-        `#{@vboxcmd} controlvm "#{instance_id}" poweroff `
+      def rollback
+        `#{@vboxcmd} controlvm "#{@instance_id}" poweroff `
         sleep 2
-        `#{@vboxcmd} snapshot "#{instance_id}" restore "#{@sandboxname}"`
+        `#{@vboxcmd} snapshot "#{@instance_id}" restore "#{@sandboxname}"`
 
-        gui_boot = machine.provider_config.gui
+        gui_boot = @machine.provider_config.gui
         if gui_boot
           boot_mode = "gui"
         else
           boot_mode = "headless"
         end
         # restore boot mode
-        `#{@vboxcmd} startvm --type #{boot_mode} "#{instance_id}" `
+        `#{@vboxcmd} startvm --type #{boot_mode} "#{@instance_id}" `
       end
 
-      def is_vm_created?(machine)
-        return !machine.id.nil?
+      def is_vm_created?
+        return !@machine.id.nil?
       end
 
     end
