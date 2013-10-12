@@ -5,3 +5,5 @@ tmp/*
 .vagrant
 Vagrantfile
 Gemfile.lock
+.bundle/
+vendor/
