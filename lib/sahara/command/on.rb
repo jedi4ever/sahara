@@ -1,5 +1,3 @@
-require "optparse"
-
 module Sahara
   module Command
     class On < Vagrant.plugin("2", :command)
@@ -18,11 +16,9 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        require "sahara/session/virtualbox"
-        ses = Sahara::Session::Virtualbox.new
-
         with_target_vms(argv, :reverse => true) do |machine|
 
+          ses = Sahara::Session::Factory.create(machine.provider_name)
           if !ses.is_vm_created?(machine) then
             puts "[#{machine.name}] VM is not created"
             next
