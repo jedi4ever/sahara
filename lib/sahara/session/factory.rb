@@ -10,7 +10,7 @@ module Sahara
           Virtualbox.new(machine)
         else
           raise Sahara::Errors::SaharaError,
-            :error_message => "#{provider_name} is not supported"
+            :error_message => "#{machine.provider_name} is not supported"
         end
       end
     end
