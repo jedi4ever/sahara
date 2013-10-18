@@ -53,19 +53,34 @@ module Sahara
         end
       end
 
-      def is_snapshot_mode_on?
+      def get_snapshot_if_exists
         # if we can get snapshot description without exception it exists
         begin
-          snapshot_desc = @domain.lookup_snapshot_by_name(@sandboxname).xml_desc
+          snapshot = @domain.lookup_snapshot_by_name(@sandboxname)
+          snapshot_desc = snapshot.xml_desc
         rescue
+          raise Sahara::Errors::SnapshotMissing
+        end
+        return snapshot
+      end
+
+      def is_snapshot_mode_on?
+        begin
+          snapshot = get_snapshot_if_exists
+        rescue Sahara::Errors::SnapshotMissing
           return false
         end
         return true
       end
 
       def off
-          snapshot = @domain.lookup_snapshot_by_name(@sandboxname)
+        snapshot = get_snapshot_if_exists
+        begin
           snapshot.delete
+        rescue Fog::Errors::Error => e
+          raise Sahara::Errors::SnapshotDeletionError,
+            :error_message => e.message
+        end
       end
 
       def on
@@ -75,7 +90,12 @@ module Sahara
           <description>Snapshot for vagrant sandbox</description>
         </domainsnapshot>
         EOF
-        @domain.snapshot_create_xml(snapshot_desc)
+        begin
+          @domain.snapshot_create_xml(snapshot_desc)
+        rescue Fog::Errors::Error => e
+          raise Sahara::Errors::SnapshotCreationError,
+            :error_message => e.message
+        end
       end
 
       def commit
@@ -84,8 +104,13 @@ module Sahara
       end
 
       def rollback
-          snapshot = @domain.lookup_snapshot_by_name(@sandboxname)
+        snapshot = get_snapshot_if_exists
+        begin
           @domain.revert_to_snapshot(snapshot)
+        rescue Fog::Errors::Error => e
+          raise Sahara::Errors::SnapshotReversionError,
+            :error_message => e.message
+        end
       end
 
       def is_vm_created?
