@@ -8,6 +8,9 @@ module Sahara
         when :virtualbox
           require_relative "virtualbox"
           Virtualbox.new(machine)
+        when :libvirt
+          require_relative "libvirt"
+          Libvirt.new(machine)
         else
           raise Sahara::Errors::ProviderNotSupported
         end

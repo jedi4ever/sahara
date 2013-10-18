@@ -2,4 +2,6 @@ en:
   sahara:
     errors:
       provider_not_supported: |-
-        Saara does not support this provider.
+        Sahara does not support this provider.
+      libvirt_connection_error: |-
+          Error while connecting to libvirt: %{error_message}
