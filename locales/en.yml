@@ -1,0 +1,5 @@
+en:
+  sahara:
+    errors:
+      provider_not_supported: |-
+        Saara does not support this provider.

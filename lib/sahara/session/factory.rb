@@ -9,8 +9,7 @@ module Sahara
           require_relative "virtualbox"
           Virtualbox.new(machine)
         else
-          raise Sahara::Errors::SaharaError,
-            :error_message => "#{machine.provider_name} is not supported"
+          raise Sahara::Errors::ProviderNotSupported
         end
       end
     end
