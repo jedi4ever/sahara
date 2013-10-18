@@ -106,7 +106,9 @@ module Sahara
       def rollback
         snapshot = get_snapshot_if_exists
         begin
-          @domain.revert_to_snapshot(snapshot)
+          # 4 is VIR_DOMAIN_SNAPSHOT_REVERT_FORCE
+          # needed due to https://bugzilla.redhat.com/show_bug.cgi?id=1006886
+          @domain.revert_to_snapshot(snapshot, 4)
         rescue Fog::Errors::Error => e
           raise Sahara::Errors::SnapshotReversionError,
             :error_message => e.message
