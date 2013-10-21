@@ -16,10 +16,19 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        ses = Sahara::Session::Command.new(@app, @env)
-
         with_target_vms(argv, :reverse => true) do |machine|
-          ses.off(machine)
+
+          ses = Sahara::Session::Factory.create(machine)
+          if !ses.is_vm_created? then
+            puts "[#{machine.name}] VM is not created"
+            next
+          end
+          if ses.is_snapshot_mode_on? then
+            ses.off
+          else
+            puts "[#{machine.name}] Not sandbox mode now"
+          end
+
         end
       end
     end

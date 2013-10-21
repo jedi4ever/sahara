@@ -1,5 +1,3 @@
-require 'optparse'
-
 module Sahara
   module Command
     class Status < Vagrant.plugin("2", :command)
@@ -19,10 +17,19 @@ module Sahara
         argv = parse_options(opts)
         return if !argv
 
-        ses = Sahara::Session::Command.new(@app, @env)
-
         with_target_vms(argv, :reverse => true) do |machine|
-          ses.status(machine)
+
+          ses = Sahara::Session::Factory.create(machine)
+          if !ses.is_vm_created? then
+            puts "[#{machine.name}] VM is not created"
+            next
+          end
+          if ses.is_snapshot_mode_on? then
+            puts "[#{machine.name}] Sandbox mode is on"
+          else
+            puts "[#{machine.name}] Sandbox mode is off"
+          end
+
         end
       end
     end

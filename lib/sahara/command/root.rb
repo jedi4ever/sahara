@@ -1,4 +1,5 @@
 require 'optparse'
+require "sahara/session/factory"
 
 module Sahara 
   module Command

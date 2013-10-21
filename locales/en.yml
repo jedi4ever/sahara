@@ -1,0 +1,15 @@
+en:
+  sahara:
+    errors:
+      provider_not_supported: |-
+        Sahara does not support this provider.
+      libvirt_connection_error: |-
+        Error while connecting to libvirt: %{error_message}
+      snapshot_missing: |-
+        Snapshot used for sandbox had unexpectedly gone missing.
+      snapshot_deletion_error: |-
+        Error while deleting snapshot: %{error_message}
+      snapshot_creation_error: |-
+        Error while creating snapshot: %{error_message}
+      snapshot_reversion_error: |-
+        Error while reverting snapshot: %{error_message}

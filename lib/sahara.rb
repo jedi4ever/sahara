@@ -2,7 +2,6 @@
 # vim: set fileencoding=utf-8
 
 require "vagrant"
-require File.expand_path("../sahara/session", __FILE__)
 
 module Sahara 
   class Plugin < Vagrant.plugin("2")
@@ -12,8 +11,14 @@ module Sahara
     DESC
 
     command("sandbox") do
+      setup_i18n
       require File.expand_path("../sahara/command/root", __FILE__)
       Command::Root
+    end
+
+    def self.setup_i18n
+      I18n.load_path << File.expand_path('../../locales/en.yml', __FILE__)
+      I18n.reload!
     end
   end
 end
