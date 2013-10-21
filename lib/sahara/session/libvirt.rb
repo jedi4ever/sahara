@@ -8,7 +8,7 @@ module Sahara
         @machine=machine
         @sandboxname="sahara-sandbox"
         @connection=connect_to_libvirt
-        @domain = @connection.client.lookup_domain_by_uuid(@machine.id)
+        @domain=get_domain
       end
 
       # based on VagrantPlugins::ProviderLibvirt::Action::ConnectLibvirt
@@ -50,6 +50,14 @@ module Sahara
         rescue Fog::Errors::Error => e
           raise Sahara::Errors::LibvirtConnectionError,
             :error_message => e.message
+        end
+      end
+
+      def get_domain
+        if is_vm_created?
+          return @connection.client.lookup_domain_by_uuid(@machine.id)
+        else
+          return nil
         end
       end
 
