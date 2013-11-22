@@ -55,7 +55,7 @@ module Sahara
       # Prints the help out for this command
       def help
         opts = OptionParser.new do |o|
-          o.banner = "Usage: vagrant plugin <command> [<args>]"
+          o.banner = "Usage: vagrant sandbox <command> [<args>]"
           o.separator ""
           o.separator "Available subcommands:"
 
@@ -69,7 +69,7 @@ module Sahara
           end
 
           o.separator ""
-          o.separator "For help on any individual command run `vagrant plugin COMMAND -h`"
+          o.separator "For help on any individual command run `vagrant sandbox <command> -h`"
         end
 
         @env.ui.info(opts.help, :prefix => false)
