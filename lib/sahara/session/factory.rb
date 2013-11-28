@@ -11,6 +11,9 @@ module Sahara
         when :libvirt
           require_relative "libvirt"
           Libvirt.new(machine)
+        when :parallels
+          require_relative "parallels"
+          Parallels.new(machine)
         else
           raise Sahara::Errors::ProviderNotSupported
         end
