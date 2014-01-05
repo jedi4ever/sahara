@@ -1,61 +1,31 @@
-require "fog"
+require "libvirt"
 
 module Sahara
   module Session
-    class ProviderLibvirt
+    class Kvm
 
       def initialize(machine)
         @machine=machine
         @sandboxname="sahara-sandbox"
-        @connection=connect_to_libvirt
+      	@conn=get_connection
         @domain=get_domain
       end
 
-      # based on VagrantPlugins::ProviderLibvirt::Action::ConnectLibvirt
-      def connect_to_libvirt
-        # Get config options for libvirt provider.
-        config = @machine.provider_config
-
-        # Setup connection uri.
-        uri = config.driver
-        if config.connect_via_ssh
-          uri << '+ssh://'
-          if config.username
-            uri << config.username + '@'
-          end
-
-          if config.host
-            uri << config.host
-          else
-            uri << 'localhost'
-          end
-        else
-          uri << '://'
-          uri << config.host if config.host
-        end
-
-        uri << '/system?no_verify=1'
-        # set ssh key for access to libvirt host
-        home_dir = `echo ${HOME}`.chomp
-        uri << "&keyfile=#{home_dir}/.ssh/id_rsa"
-
-        conn_attr = {}
-        conn_attr[:provider] = 'libvirt'
-        conn_attr[:libvirt_uri] = uri
-        conn_attr[:libvirt_username] = config.username if config.username
-        conn_attr[:libvirt_password] = config.password if config.password
-
+      def get_connection
         begin
-          Fog::Compute.new(conn_attr)
-        rescue Fog::Errors::Error => e
-          raise Sahara::Errors::LibvirtConnectionError,
-            :error_message => e.message
+          Libvirt::open('qemu:///system')
+      	rescue Libvirt::Error => e
+          if e.libvirt_code == 5
+            raise Sahara::Errors::LibvirtConnectionError
+          else
+            raise e
+          end
         end
       end
 
       def get_domain
         if is_vm_created?
-          return @connection.client.lookup_domain_by_uuid(@machine.id)
+          return @conn.lookup_domain_by_uuid(@machine.id)
         else
           return nil
         end
@@ -85,7 +55,7 @@ module Sahara
         snapshot = get_snapshot_if_exists
         begin
           snapshot.delete
-        rescue Fog::Errors::Error => e
+        rescue Libvirt::Error => e
           raise Sahara::Errors::SnapshotDeletionError,
             :error_message => e.message
         end
@@ -100,7 +70,7 @@ module Sahara
         EOF
         begin
           @domain.snapshot_create_xml(snapshot_desc)
-        rescue Fog::Errors::Error => e
+        rescue Libvirt::Error => e
           raise Sahara::Errors::SnapshotCreationError,
             :error_message => e.message
         end
@@ -117,7 +87,7 @@ module Sahara
           # 4 is VIR_DOMAIN_SNAPSHOT_REVERT_FORCE
           # needed due to https://bugzilla.redhat.com/show_bug.cgi?id=1006886
           @domain.revert_to_snapshot(snapshot, 4)
-        rescue Fog::Errors::Error => e
+        rescue Libvirt::Error => e
           raise Sahara::Errors::SnapshotReversionError,
             :error_message => e.message
         end
