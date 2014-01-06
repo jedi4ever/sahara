@@ -10,10 +10,13 @@ module Sahara
           Virtualbox.new(machine)
         when :libvirt
           require_relative "libvirt"
-          Libvirt.new(machine)
+          ProviderLibvirt.new(machine)
         when :parallels
           require_relative "parallels"
           Parallels.new(machine)
+        when :kvm
+	        require_relative "kvm"
+	        Kvm.new(machine)
         else
           raise Sahara::Errors::ProviderNotSupported
         end
