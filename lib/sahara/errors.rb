@@ -29,5 +29,9 @@ module Sahara
       error_key("snapshot_reversion_error")
     end
 
+    class HostOsNotSupported < Sahara::Errors::Error
+      error_key("host_os_not_supported")
+    end
+
   end
 end

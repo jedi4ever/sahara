@@ -7,3 +7,5 @@ Vagrantfile
 Gemfile.lock
 .bundle/
 vendor/
+.idea/
+*.iml
