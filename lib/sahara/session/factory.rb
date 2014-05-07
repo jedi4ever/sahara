@@ -14,6 +14,9 @@ module Sahara
         when :parallels
           require_relative "parallels"
           Parallels.new(machine)
+        when :vmware_fusion
+          require_relative "vmware"
+          VMWare.new(machine)
         else
           raise Sahara::Errors::ProviderNotSupported
         end
