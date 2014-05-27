@@ -25,10 +25,10 @@ module Sahara
           end
           if !ses.is_snapshot_mode_on? then
             puts "[#{machine.name}] Not sandbox mode now"
-            next
+          else
+            puts "[#{machine.name}] Rolling back the virtual machine..."
+            ses.rollback
           end
-          ses.rollback
-
         end
       end
     end

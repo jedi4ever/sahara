@@ -24,6 +24,7 @@ module Sahara
             next
           end
           if ses.is_snapshot_mode_on? then
+            puts "[#{machine.name}] Committing the virtual machine..."
             ses.commit
           else
             puts "[#{machine.name}] Not sandbox mode now"
