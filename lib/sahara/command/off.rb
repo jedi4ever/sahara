@@ -24,6 +24,7 @@ module Sahara
             next
           end
           if ses.is_snapshot_mode_on? then
+            puts "[#{machine.name}] Stopping sandbox mode..."
             ses.off
           else
             puts "[#{machine.name}] Not sandbox mode now"
