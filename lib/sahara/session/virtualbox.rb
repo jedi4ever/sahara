@@ -11,10 +11,11 @@ module Sahara
 
       def determine_vboxcmd
         if windows?
-          # On Windows, we use the VBOX_INSTALL_PATH environmental
-          if ENV.has_key?("VBOX_INSTALL_PATH")
+          # On Windows, we use the VBOX_INSTALL_PATH and VBOX_MSI_INSTALL_PATH environmental
+          if ENV.has_key?("VBOX_INSTALL_PATH") || ENV.has_key?("VBOX_MSI_INSTALL_PATH")
             # The path usually ends with a \ but we make sure here
-            path = File.join(ENV["VBOX_INSTALL_PATH"], "VBoxManage.exe")
+            path = ENV["VBOX_INSTALL_PATH"] || ENV["VBOX_MSI_INSTALL_PATH"]
+            path = File.join(path, "VBoxManage.exe")
             return "\"#{path}\""
           end
         else
