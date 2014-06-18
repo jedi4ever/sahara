@@ -32,5 +32,11 @@ This is now available as gem:
 vagrant plugin install sahara
 </pre>
 
+# Supported providers
+- VirtualBox
+- VMware Fusion
+- libvirt
+- Parallels
+
 # License
 This is licensed under the MIT license.
