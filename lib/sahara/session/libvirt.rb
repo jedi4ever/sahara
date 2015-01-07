@@ -115,7 +115,7 @@ module Sahara
         on
       end
 
-      def rollback
+      def rollback(resume)
         snapshot = get_snapshot_if_exists
         begin
           # 4 is VIR_DOMAIN_SNAPSHOT_REVERT_FORCE

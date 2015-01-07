@@ -60,10 +60,12 @@ module Sahara
         `#{@vboxcmd} snapshot "#{@instance_id}" take "#{@sandboxname}" --pause`
       end
 
-      def rollback
+      def rollback(resume)
         `#{@vboxcmd} controlvm "#{@instance_id}" poweroff `
         sleep 2
         `#{@vboxcmd} snapshot "#{@instance_id}" restore "#{@sandboxname}"`
+
+        return if !resume
 
         gui_boot = @machine.provider_config.gui
         if gui_boot

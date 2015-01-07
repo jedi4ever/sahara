@@ -35,9 +35,11 @@ module Sahara
         `#{@vmwarecmd} -T ws snapshot "#{@vmx_path}" "#{@sandboxname}"`
       end
 
-      def rollback
+      def rollback(resume)
         `#{@vmwarecmd} -T ws revertToSnapshot "#{@vmx_path}" "#{@sandboxname}" `
         sleep 2
+
+        return if !resume
 
         gui_boot = @machine.provider_config.gui
         if gui_boot

@@ -4,11 +4,16 @@ module Sahara
       def execute
 
         options = {}
+        options[:resume] = true
 
         opts = OptionParser.new do |opts|
           opts.banner = "Rollback changes since sandbox state was entered"
           opts.separator ""
           opts.separator "Usage: vagrant sandbox rollback <vmname>"
+
+          opts.on("", "--[no-]resume", "Resume machine after rolling back changes") do |v|
+              options[:resume] = v
+          end
 
         end
 
@@ -27,7 +32,7 @@ module Sahara
             puts "[#{machine.name}] Not sandbox mode now"
           else
             puts "[#{machine.name}] Rolling back the virtual machine..."
-            ses.rollback
+            ses.rollback(options[:resume])
           end
         end
       end

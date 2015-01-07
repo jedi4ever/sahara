@@ -56,9 +56,11 @@ module Sahara
         on
       end
 
-      def rollback
+      def rollback(resume)
         snapshot_id = get_snapshot_id
-        `#{@prlctl} snapshot-switch "#{@instance_id}" --id "#{snapshot_id}" `
+        command = "#{@prlctl} snapshot-switch \"#{@instance_id}\" --id \"#{snapshot_id}\" "
+        command << " --skip-resume" if !resume
+        `#{command}`
       end
 
       def is_vm_created?
