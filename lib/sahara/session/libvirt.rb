@@ -11,37 +11,19 @@ module Sahara
         @domain=get_domain
       end
 
-      # based on VagrantPlugins::ProviderLibvirt::Action::ConnectLibvirt
+      # based on VagrantPlugins::ProviderLibvirt::Driver
       def connect_to_libvirt
+        # reuse the libvirt connection if available
+        if @machine.provider.respond_to? :connection
+          return @machine.provider.connection
+        end
+        # fallback to building a new connection
+
         # Get config options for libvirt provider.
         config = @machine.provider_config
 
-        # Setup connection uri.
-        uri = config.driver
-        if uri == "kvm"
-          uri = "qemu"
-        end
-
-        if config.connect_via_ssh
-          uri << '+ssh://'
-          if config.username
-            uri << config.username + '@'
-          end
-
-          if config.host
-            uri << config.host
-          else
-            uri << 'localhost'
-          end
-        else
-          uri << '://'
-          uri << config.host if config.host
-        end
-
-        uri << '/system?no_verify=1'
-        # set ssh key for access to libvirt host
-        home_dir = `echo ${HOME}`.chomp
-        uri << "&keyfile=#{home_dir}/.ssh/id_rsa"
+        # Use vagrant-libvirt constructed uri.
+        uri = config.uri
 
         conn_attr = {}
         conn_attr[:provider] = 'libvirt'
