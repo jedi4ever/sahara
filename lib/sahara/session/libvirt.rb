@@ -1,4 +1,4 @@
-require "fog"
+require "fog/libvirt"
 
 module Sahara
   module Session
