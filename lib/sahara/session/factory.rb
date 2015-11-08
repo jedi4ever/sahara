@@ -17,6 +17,9 @@ module Sahara
         when :vmware_fusion
           require_relative "vmware"
           VMWare.new(machine)
+        when :digital_ocean
+          require_relative "digital_ocean"
+          DigitalOcean.new(machine)
         else
           raise Sahara::Errors::ProviderNotSupported
         end
